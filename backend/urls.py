@@ -18,6 +18,7 @@ from django.urls import path, include
 from rest_framework import routers
 from stocket.views import *
 
+
 router = routers.DefaultRouter()
 router.register(r'users', UserView, 'user')
 router.register(r'accounts', AccountView, 'account')
@@ -26,7 +27,22 @@ router.register(r'transactions', TransactionView, 'transaction')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('api/', include(router.urls)),
     path('api/', include('rest_framework.urls')),
-    path('api/users', include('django.contrib.auth.urls'))
+    path('api/users/', include('django.contrib.auth.urls')),
+
+    path('api/tickers/base', TickerBase.as_view()),
+    path('api/tickers/base/modules', TickerModules.as_view()),
+    path('api/tickers/financials', TickerFinancials.as_view()),
+    path('api/tickers/financials/modules', TickerFinancialModules.as_view()),
+    path('api/tickers/options', TickerOptions.as_view()),
+    path('api/tickers/history', TickerHistoricalPrices.as_view()),
+    path('api/tickers/events', TickerEvents.as_view()),
+    path('api/tickers/insights', TickerInsights.as_view()),
+
+    path('api/news', News.as_view()),
+    path('api/screeners/modules', ScreenerModules.as_view()),
+    path('api/screeners', Screener.as_view()),
+    path('api/search', Search.as_view()),
 ]

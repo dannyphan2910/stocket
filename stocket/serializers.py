@@ -15,11 +15,11 @@ class AccountSerializer(serializers.ModelSerializer):
 
 
 class PortfolioSerializer(serializers.ModelSerializer):
-    transactions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    transactions = serializers.PrimaryKeyRelatedField(many=True, read_only=True, source='transaction_set')
 
     class Meta:
         model = Portfolio
-        fields = ('id', 'account', 'version', 'created_at', 'transactions')
+        fields = ('id', 'account', 'title', 'created_at', 'transactions')
 
 
 class TransactionSerializer(serializers.ModelSerializer):
