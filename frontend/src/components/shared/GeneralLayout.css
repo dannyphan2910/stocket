@@ -1,0 +1,20 @@
+.layout-general {
+    background: rgb(101, 223, 201) !important;
+    background: -moz-linear-gradient(45deg, rgba(101, 223, 201, 1) 0%, rgba(101, 150, 246, 1) 100%) !important;
+    background: -webkit-linear-gradient(45deg, rgba(101, 223, 201, 1) 0%, rgba(101, 150, 246, 1) 100%) !important;
+    background: linear-gradient(45deg, rgba(101, 223, 201, 1) 0%, rgba(101, 150, 246, 1) 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#65dfc9",endColorstr="#6596f6",GradientType=1) !important;
+}
+
+.layout {
+    /* background-color: #07beb8 !important; */
+}
+
+.layout-header .ant-select-selector {
+    border-radius: 50px !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 8px 32px 0 rgba(196, 255, 249, 0.35) !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+    border: none !important;
+}

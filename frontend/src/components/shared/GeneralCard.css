@@ -1,0 +1,9 @@
+.styled-card {
+    background: rgb(255, 255, 255, 0.50) !important;
+    box-shadow: 0 8px 32px 10px rgba( 196, 255, 249, 0.45 ) !important;
+    backdrop-filter: blur( 6.0px ) !important;
+    -webkit-backdrop-filter: blur( 6.0px ) !important;
+    border-radius: 20px !important;
+    border: none !important;
+    width: 100%;
+}

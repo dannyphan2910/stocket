@@ -141,3 +141,4 @@ cython_debug/
 Makefile
 .DS_Store
 Pipfile
+.vscode/*

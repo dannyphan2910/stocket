@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import {
 	BrowserRouter as Router,
@@ -10,14 +10,14 @@ import Login from './components/authentication/Login';
 import Home from './components/home/Home';
 
 function App() {
-  return (
-			<Router>
-				<Switch>
+	return (
+		<Router>
+			<Switch>
 				<Route path="/" exact component={Home} />
 				<Route path="/login" exact component={Login} />
 				<Route path="/register" exact component={Register} />
-				</Switch>
-			</Router>
+			</Switch>
+		</Router>
 	);
 }
 
