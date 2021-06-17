@@ -22,7 +22,8 @@ class Account(models.Model):
 class Portfolio(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)  # the only active version will the be latest one
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"user #{self.account_id}: {self.title}"
@@ -49,4 +50,17 @@ class Transaction(models.Model):
         return price if self.transaction_type == 1 else -price  # sell -> +amount*price; buy -> -amount*price
 
     class Meta:
+        order_with_respect_to = 'portfolio'
+
+
+class Snapshot(models.Model):
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    market_value = models.DecimalField(max_digits=8, decimal_places=2)
+    time_record = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.portfolio_id} - valued {self.market_value} at {self.time_record}"
+
+    class Meta:
+        unique_together = ['portfolio', 'time_record']
         order_with_respect_to = 'portfolio'

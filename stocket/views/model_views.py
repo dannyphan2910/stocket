@@ -45,6 +45,17 @@ class PortfolioView(APIAuthRequest, ModelViewSet):
     queryset = Portfolio.objects.all()
     filterset_fields = ('account')
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        account_id = int(data['account'])
+        response = super(TransactionView, self).create(request, args, kwargs)
+
+        if response.status_code == 200:
+            account = Account.objects.get(pk=account_id)
+            discard_old_portfolio(account)
+
+        return response
+
 
 class TransactionView(APIAuthRequest, ModelViewSet):
     serializer_class = TransactionSerializer
@@ -77,6 +88,24 @@ class TransactionView(APIAuthRequest, ModelViewSet):
             update_balance(account, transaction_type, price)
 
         return response
+
+
+class SnapshotView(APIAuthRequest, ModelViewSet):
+    serializer_class = SnapshotSerializer
+    queryset = Snapshot.objects.all()
+    filterset_fields = ('portfolio',)
+
+    def list(self, request, *args, **kwargs):
+        portfolio_id = request.query_params.get('portfolio')
+        all_snapshots = []
+        if portfolio_id is None:
+            active_portfolios = Portfolio.objects.filter(is_active=True).order_by('id')
+            for portfolio in active_portfolios.iterator():
+                all_snapshots.extend(performance_snapshot_portfolio(portfolio.id))
+        else:
+            all_snapshots.extend(performance_snapshot_portfolio(portfolio_id))
+        serializer = SnapshotSerializer(all_snapshots, many=True)
+        return Response(serializer.data)
 
 
 

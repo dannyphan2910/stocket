@@ -126,7 +126,7 @@ class ScreenerModules(APIView):
         return Response(get_all_screeners())
 
 
-class Screener(APIView):
+class ScreenerList(APIView):
     def get(self, request):
         data = request.query_params
         screeners = data['screeners'] if 'screeners' in data.keys() else None
