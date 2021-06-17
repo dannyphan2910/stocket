@@ -26,3 +26,11 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ('id', 'portfolio', 'transaction_type', 'ticker_symbol', 'amount', 'order_price', 'created_at')
+
+
+class SnapshotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Snapshot
+        fields = ('id', 'portfolio', 'market_value', 'time_record')
+
+

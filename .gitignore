@@ -142,3 +142,5 @@ Makefile
 .DS_Store
 Pipfile
 .vscode/*
+test.py
+dump.rdb

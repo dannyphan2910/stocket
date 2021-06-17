@@ -24,6 +24,7 @@ router.register(r'users', UserView, 'user')
 router.register(r'accounts', AccountView, 'account')
 router.register(r'portfolios', PortfolioView, 'portfolio')
 router.register(r'transactions', TransactionView, 'transaction')
+router.register(r'snapshots', SnapshotView, 'snapshot')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -43,6 +44,7 @@ urlpatterns = [
 
     path('api/news', News.as_view()),
     path('api/screeners/modules', ScreenerModules.as_view()),
-    path('api/screeners', Screener.as_view()),
+    path('api/screeners', ScreenerList.as_view()),
     path('api/search', Search.as_view()),
 ]
+

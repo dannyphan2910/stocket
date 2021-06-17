@@ -1,5 +1,5 @@
 import decimal
-
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.db import connection
 from rest_framework import status
@@ -30,6 +30,13 @@ def get_account_by_portfolio(portfolio_id):
 
 def get_current_portfolio(account):
     return account.portfolio_set.order_by('-created_at').first()
+
+
+def discard_old_portfolio(account):
+    portfolios = account.portfolio_set.order_by('-created_at')
+    if len(portfolios) > 1:
+        old_portfolios = portfolios[1:]
+        old_portfolios.update(is_active=False)
 
 
 def get_portfolio_breakdown(portfolio):
@@ -76,19 +83,6 @@ def get_portfolio_breakdown(portfolio):
     return breakdown
 
 
-def get_market_value(ticker_symbol, total_shares):
-    ticker_info = get_tickers_base(ticker_symbol, 'price')[ticker_symbol]
-    market_state = ticker_info['marketState']
-    if market_state == 'REGULAR':
-        market_price = ticker_info['regularMarketPrice']
-    elif market_state == 'PRE':
-        market_price = ticker_info['preMarketPrice']
-    else:  # == 'POST'
-        market_price = ticker_info['postMarketPrice']
-    market_value = round(total_shares * decimal.Decimal(market_price), 2)
-    return market_value
-
-
 def get_total_investments(transactions):
     total = 0
     if transactions.exists():
@@ -107,6 +101,75 @@ def update_balance(account, transaction_type, price):
     elif transaction_type == 1:
         account.balance += price
     account.save()
+
+
+def performance_snapshot_portfolio(portfolio_id):
+    all_snapshots = []
+    portfolio = Portfolio.objects.get(pk=portfolio_id)
+    transactions = Transaction.objects.filter(portfolio=portfolio)
+    if transactions.exists():
+        time_record = datetime.now().replace(microsecond=0, second=0, minute=30)
+        is_current_market = datetime.now().replace(microsecond=0, second=0, minute=30, hour=9) \
+                            <= time_record \
+                            <= datetime.now().replace(microsecond=0, second=0, minute=59, hour=15)
+        snapshots = Snapshot.objects.filter(portfolio=portfolio)
+        # only get the snapshot for opening hours
+        if not is_current_market:
+            # if not snapshot created or if the latest snapshot is not created for the last hour
+            # we populate the table using historical hourly pricing for the year (if no snapshot)
+            # or for the hours after the last snapshot
+            # else, create the snapshot for the most recent opening hour (XX:30:00)
+            if not snapshots.exists():
+                start_date = portfolio.created_at
+            elif not last_record_is_latest(snapshots.order_by('-time_record').first().time_record):
+                start_date = snapshots.order_by('-time_record').first().time_record
+            else:
+                start_date = time_record
+            print(start_date)
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT ticker_symbol, SUM(amount * (IF(transaction_type = 1, -1, 1))) as total_shares "
+                    "FROM stocket_transaction "
+                    "WHERE portfolio_id = %s "
+                    "GROUP BY ticker_symbol;", (portfolio.id,))
+
+                portfolio_dict = {}
+                for ticker_symbol, total_shares in cursor.fetchall():
+                    portfolio_dict[ticker_symbol] = total_shares
+
+                history = get_tickers_historical(
+                    ticker_symbols=portfolio_dict.keys(),
+                    interval='1h',
+                    start=start_date,
+                    df_by_date=True
+                )
+                # loop until now
+                for time, record in history.items():
+                    total_value = 0
+                    if time <= time_record:
+                        for entry in record:
+                            total_value += decimal.Decimal(entry['close']) * portfolio_dict[entry['symbol']]
+
+                        new_snapshot = Snapshot(portfolio=portfolio,
+                                                market_value=round(total_value, 2),
+                                                time_record=time)
+                        all_snapshots.append(new_snapshot)
+    return all_snapshots
+
+
+def last_record_is_latest(last_time_record):
+    last_time_record = datetime(last_time_record)
+    base_last_record = last_time_record.replace(microsecond=0, second=0, minute=0, hour=0)
+    now = datetime.now().replace(microsecond=0, second=0, minute=30) # guaranteed to be in current market hours
+    base_now = now.replace(microsecond=0, second=0, minute=0, hour=0)
+
+    if base_now == base_last_record + timedelta(days=1) and (now.hour == 9 and last_time_record.hour == 15) \
+            and (now.minute == last_time_record.minute):
+        return True
+    if base_now == base_last_record and now == last_time_record + timedelta(hours=1):
+        return True
+    return False
 
 
 def handle_request_errors(message):
