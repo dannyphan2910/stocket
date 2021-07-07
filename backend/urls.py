@@ -27,6 +27,7 @@ router.register(r'transactions', TransactionView, 'transaction')
 router.register(r'snapshots', SnapshotView, 'snapshot')
 
 urlpatterns = [
+    path('', redirect_view),
     path('admin/', admin.site.urls),
 
     path('api/', include(router.urls)),

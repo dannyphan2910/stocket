@@ -2,6 +2,7 @@ import decimal
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.db import connection
+from django.shortcuts import redirect
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -21,6 +22,11 @@ BREAKDOWN_DEFAULT = {
 class APIAuthRequest:
     authentication_classes = authentication_classes
     permission_classes = permission_classes
+
+
+def redirect_view(request):
+    response = redirect('/api')
+    return response
 
 
 def get_account_by_portfolio(portfolio_id):

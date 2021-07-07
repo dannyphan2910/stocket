@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '=8b&pj@k86g%bfkbz_8^^^^6sz@m9w#84e9!87lwzl($$n#ku@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['stocket.us-east-2.elasticbeanstalk.com']
 
 
 # Application definition

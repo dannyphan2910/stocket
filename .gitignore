@@ -141,6 +141,11 @@ cython_debug/
 Makefile
 .DS_Store
 Pipfile
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
 **/.vscode/
 test.py
 dump.rdb
