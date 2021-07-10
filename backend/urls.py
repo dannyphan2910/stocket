@@ -29,7 +29,6 @@ router.register(r'snapshots', SnapshotView, 'snapshot')
 urlpatterns = [
     path('', redirect_view),
     path('admin/', admin.site.urls),
-
     path('api/', include(router.urls)),
     path('api/', include('rest_framework.urls')),
     path('api/users/', include('django.contrib.auth.urls')),
